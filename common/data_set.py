@@ -38,6 +38,10 @@ class Apple(pygame.sprite.Sprite):
 # ★ 사과 그룹 - 게임 시작 시 딱 한 번만 생성
 apple_group = pygame.sprite.Group()
 
+# 재시작 시 apple_group 초기화 필요
+def reset_apple_group():
+    apple_group.empty()
+
 def create_apples():
     for i in range(17):
         for j in range(10):

@@ -4,26 +4,29 @@ import time
 import random
 from common.color import WHITE, BLACK, RED, GREEN, BLUE
 from common.set_page import SCREEN_WIDTH, SCREEN_HEIGHT, screen
-from common.data_set import apple_group, create_apples, dragging, start, end 
+from common.data_set import apple_group, create_apples, dragging, start, end , reset_apple_group
 
-flag = 1
+
+# flag = 1
 score = 0
 
 
 pygame.font.init()
 font = pygame.font.Font(None, 50)
 
-def game_page(events, game_time):
+def get_game_page(events, game_time, flag, finish):
     global dragging, start, end 
-    global flag, score
+    global score
 
     # 게임시작시 배경화면은 초록색으로 설정
     screen.fill(GREEN)
     
     # ★ 딱 한 번만 호출
     if flag == 1:
-        create_apples()  
-        flag = 0
+        reset_apple_group() # 사과 리스트 초기화
+        create_apples()     # 사과 생성
+        flag = 0            # 게임 시작 플래그 초기화
+        score = 0           # 최종 점수 초기화
         
     # ★ 사과는 apple_group에서 그리기만 함 (새로 생성 X)
     # game_page.py 수정
@@ -89,11 +92,10 @@ def game_page(events, game_time):
     time_text = font.render(f"Time: {game_time:.1f}", True, WHITE)
     screen.blit(time_text, (10, 60))  # 글로 표기
     # 막대바로 남은 시간 표기 (위치는 사과 박스 위에 표시, 사이즈는 사과 박스 크기와 동일)
-    # 제한시간은 150초(2분30초)
-    finish = 150
     time_bar_width = (finish - game_time) / finish * 850
     pygame.draw.rect(screen, RED, (215, 90, time_bar_width, 20))
     
 
     pygame.display.update()
             
+    return score
