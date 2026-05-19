@@ -1,21 +1,99 @@
+import os
 import pygame
-import random
 import time
+import random
 from common.color import WHITE, BLACK, RED, GREEN, BLUE
 from common.set_page import SCREEN_WIDTH, SCREEN_HEIGHT, screen
-from common.data_set import apple_image, apple_number
+from common.data_set import apple_group, create_apples, dragging, start, end 
 
-# 게임 화면
-def game_page():
-    # 바탕 화면에서 게임 화면으로 전환
-    screen.fill(GREEN) # 화면을 흰색으로 채우기
-    # 게임 화면에 사과 가로 (17) * 세로(10) 개 띄우고 화면 중앙에 위치하기
-    # 사과 이미지 위에 1 ~ 9 까지 랜덤 숫자 표시, 숫자는 게임 진행 내 1회만 설정 (처음 숫자가 정해진 후 변경 x)
-    for i in range(17):
-        for j in range(10):
-            screen.blit(apple_image, (i * 50 + 220, j * 50 + 90)) # (x, y) 사과 이미지 표시
-            font = pygame.font.Font(None, 50) # 폰트 설정
-            text = font.render(str(apple_number[i][j]), True, WHITE) # 텍스트 생성
-            text_rect = text.get_rect(center=(i * 50 + 245, j * 50 + 115)) # 텍스트 위치 설정
-            screen.blit(text, text_rect) # 텍스트 표시
+flag = 1
+score = 0
 
+
+pygame.font.init()
+font = pygame.font.Font(None, 50)
+
+def game_page(events, game_time):
+    global dragging, start, end 
+    global flag, score
+
+    # 게임시작시 배경화면은 초록색으로 설정
+    screen.fill(GREEN)
+    
+    # ★ 딱 한 번만 호출
+    if flag == 1:
+        create_apples()  
+        flag = 0
+        
+    # ★ 사과는 apple_group에서 그리기만 함 (새로 생성 X)
+    # game_page.py 수정
+    for apple in apple_group:
+        apple.draw_text(screen, font)  # draw → draw_text 로 변경
+
+    # 이벤트 처리
+    for event in events:
+        #if event.type == pygame.QUIT:
+        #    pygame.quit()
+        #    return
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            dragging = True
+            start = event.pos
+            end = event.pos
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            dragging = False
+            end = event.pos
+
+            # ★ 드래그 종료 시 판정
+            drag_rect = pygame.Rect(
+                min(start[0], end[0]),
+                min(start[1], end[1]),
+                abs(end[0] - start[0]),
+                abs(end[1] - start[1])
+            )
+
+            selected = [a for a in apple_group if drag_rect.colliderect(a.rect)]
+            total = sum(a.number for a in selected)
+
+            if total == 10:
+                score += len(selected)
+                for apple in selected:
+                    apple_group.remove(apple)  # ★ 합이 10이면 삭제
+
+            # 드래그 초기화
+            start = (0, 0)
+            end = (0, 0)
+
+        elif event.type == pygame.MOUSEMOTION and dragging:
+            end = event.pos
+
+    # 드래그 사각형 (방향 무관)
+    if dragging:
+        x = min(start[0], end[0])
+        y = min(start[1], end[1])
+        w = abs(end[0] - start[0])
+        h = abs(end[1] - start[1])
+        pygame.draw.rect(screen, RED, (x, y, w, h), 2)
+
+        # ★ 드래그 중 선택된 사과 하이라이트
+        drag_rect = pygame.Rect(x, y, w, h)
+        for apple in apple_group:
+            apple.selected = drag_rect.colliderect(apple.rect)
+
+    # 점수 표시
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (10, 10))
+
+    # 제한시간 표시
+    time_text = font.render(f"Time: {game_time:.1f}", True, WHITE)
+    screen.blit(time_text, (10, 60))  # 글로 표기
+    # 막대바로 남은 시간 표기 (위치는 사과 박스 위에 표시, 사이즈는 사과 박스 크기와 동일)
+    # 제한시간은 150초(2분30초)
+    finish = 150
+    time_bar_width = (finish - game_time) / finish * 850
+    pygame.draw.rect(screen, RED, (215, 90, time_bar_width, 20))
+    
+
+    pygame.display.update()
+            
