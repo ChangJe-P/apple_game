@@ -2,14 +2,16 @@ import pygame
 import random
 import time
 from common.color import WHITE, BLACK, RED, GREEN, BLUE
-from common.set_page import SCREEN_WIDTH, SCREEN_HEIGHT, screen, start_button
-from common.data_set import apple_tree_image
+from common.set_page import SCREEN_WIDTH, SCREEN_HEIGHT, screen, start_button, tree_image
+#from common.game_page import score # 최종 점수 가져오기
+
+# 이미지의 Rect 정보를 가져오면서 중앙(center) 좌표를 화면 중앙으로 설정
+image_rect = tree_image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
 
 # 배경 화면
-def start_page():
-    screen.fill(WHITE) # 화면을 흰색으로 채우기
-    # 흰색 바탕에 사과 5개 띄우기
-    screen.blit(apple_tree_image, (0, 0)) # 사과 이미지 표시
+def start_page(score):
+    # 흰색 바탕에 사과 나무 띄우기
+    screen.blit(tree_image, image_rect) # 사과 이미지 표시     ----> 여기서 부터 시작하자 클래스 활용
     # 게임 시작 버튼 누르면 게임 화면으로 이동
     pygame.draw.rect(screen, RED, start_button) # 게임 시작 버튼 그리기 
     # 게임 시작 버튼에 텍스트 표시
@@ -17,4 +19,10 @@ def start_page():
     text = font.render("START", True, WHITE) # 텍스트 생성
     text_rect = text.get_rect(center=start_button.center) # 텍스트 위치 설정
     screen.blit(text, text_rect) # 텍스트 표시
+
+    # 최종 score 표기하기 (표시 위치는 게임 시작 버튼 위에 표시)
+    final_score_text = font.render(f"Score: {score}", True, WHITE) # 최종 점수 표시
+    final_score_rect = final_score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50)) # 최종 점수 위치 설정
+    screen.blit(final_score_text, final_score_rect) # 최종 점수 표시
     
+    pygame.display.update()
