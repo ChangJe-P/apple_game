@@ -42,12 +42,11 @@ while running:
     # 게임 화면과 게임 바탕화면 구분 
     if game_state == "start": 
         start_page(score)
-    
-    # 게임 시작 버튼 클릭시 game_state를 game으로 변경 
-    if event.type == pygame.MOUSEBUTTONDOWN: # 마우스 클릭 이벤트가 발생하면 
-        if start_button.collidepoint(event.pos):    # 마우스 클릭이 버튼 안에 있으면 
-            game_state = "game" # 게임 화면으로 전환 
-            start_time = time.perf_counter() 
+        # 게임 시작 버튼 클릭시 game_state를 game으로 변경 
+        if event.type == pygame.MOUSEBUTTONDOWN: # 마우스 클릭 이벤트가 발생하면 
+            if start_button.collidepoint(event.pos):    # 마우스 클릭이 버튼 안에 있으면 
+                game_state = "game" # 게임 화면으로 전환 
+                start_time = time.perf_counter() 
 
     # game_state == "game" 이면 게임 화면 띄우기
     if game_state == "game":
